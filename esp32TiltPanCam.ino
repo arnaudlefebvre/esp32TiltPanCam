@@ -2,6 +2,8 @@
 #include <WiFi.h>
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
+
+#include "secrets.h"
 //
 // WARNING!!! Make sure that you have either selected ESP32 Wrover Module,
 //            or another board which has PSRAM enabled
@@ -13,8 +15,8 @@
 //#define CAMERA_MODEL_M5STACK_PSRAM
 #define CAMERA_MODEL_AI_THINKER
 
-const char* ssid = "RoiDesLoutres";
-const char* password = "C4E6A360";
+const char* ssid = WIFI_SSID;
+const char* password = WIFI_PASSWORD;
 
 
 #if defined(CAMERA_MODEL_WROVER_KIT)
