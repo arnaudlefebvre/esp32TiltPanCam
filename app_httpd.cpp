@@ -249,8 +249,8 @@ body{font-family:Arial,Helvetica,sans-serif;background:#ffffff;color:#000000;fon
                          <div class="input-group" id="CamTilt-group">
                             <label for="CamTilt">Control CamTilt</label>
                             <div class="range-min">0</div>
-                            <input type="range" id="CamTilt" min="0" max="50" value="15" class="default-action">
-                            <div class="range-max">50</div>
+                            <input type="range" id="CamTilt" min="0" max="55" value="20" class="default-action">
+                            <div class="range-max">55</div>
                         </div>
                         <div class="input-group" id="CamRotate-group">
                             <label for="CamRotate">Control CamRotate</label>
@@ -283,7 +283,7 @@ document.addEventListener('DOMContentLoaded',function(){function b(B){let C;swit
                           )rawliteral";
 ///////////
 
-int CAMTILT = 15, CAMROTATE = 90, CAMFAKE = 90;
+int CAM_TILT = 15, CAM_ROTATE = 90;
 
 typedef struct {
         size_t size; //number of values used for filtering
@@ -736,19 +736,10 @@ static esp_err_t cmd_handler(httpd_req_t *req){
         if(s->pixformat == PIXFORMAT_JPEG) res = s->set_framesize(s, (framesize_t)val);
     }
     else if(!strcmp(variable, "CamTilt")) {
-      CAMTILT = val;
-      Serial.print("CAMTILT du cpp : ");
-      Serial.println(CAMTILT);    
+      CAM_TILT = val;
     }
     else if(!strcmp(variable, "CamRotate")) {
-      CAMROTATE = val;
-      Serial.print("CAMROTATE du cpp : ");
-      Serial.println(CAMROTATE);
-    }
-    else if(!strcmp(variable, "CamFake")) {
-      CAMFAKE = val;
-      Serial.print("CAMFAKE du cpp : ");
-      Serial.println(CAMFAKE);
+      CAM_ROTATE = val;
     }
     else if(!strcmp(variable, "quality")) res = s->set_quality(s, val);
     else if(!strcmp(variable, "contrast")) res = s->set_contrast(s, val);
@@ -773,17 +764,12 @@ static esp_err_t cmd_handler(httpd_req_t *req){
     else if(!strcmp(variable, "special_effect")) res = s->set_special_effect(s, val);
     else if(!strcmp(variable, "wb_mode")) res = s->set_wb_mode(s, val);
     else if(!strcmp(variable, "ae_level")){ 
-
       Serial.printf("var=");
       Serial.printf(variable);
-
-      
       res = s->set_ae_level(s, val);
-  Serial.printf(" valvar=");
-  Serial.print(val);
-
-      
-      }
+      Serial.printf(" valvar=");
+      Serial.print(val);
+    } 
     else if(!strcmp(variable, "face_detect")) {
         detection_enabled = val;
         if(!detection_enabled) {
@@ -843,9 +829,8 @@ static esp_err_t status_handler(httpd_req_t *req){
     p+=sprintf(p, "\"face_detect\":%u,", detection_enabled);
     p+=sprintf(p, "\"face_enroll\":%u,", is_enrolling);
     p+=sprintf(p, "\"face_recognize\":%u", recognition_enabled);
-    p+=sprintf(p, "\"CamTilt\":%u,", CAMTILT);
-    p+=sprintf(p, "\"CamRotate\":%u,", CAMROTATE);
-    p+=sprintf(p, "\"CamFake\":%u,", CAMFAKE);
+    p+=sprintf(p, "\"CamTilt\":%u,", CAM_TILT);
+    p+=sprintf(p, "\"CamRotate\":%u,", CAM_ROTATE);
     *p++ = '}';
     *p++ = 0;
     httpd_resp_set_type(req, "application/json");

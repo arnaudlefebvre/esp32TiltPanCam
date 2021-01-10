@@ -4,59 +4,9 @@
 #include "soc/rtc_cntl_reg.h"
 
 #include "secrets.h"
-//
-// WARNING!!! Make sure that you have either selected ESP32 Wrover Module,
-//            or another board which has PSRAM enabled
-//this edit code doesn't use a gzipped html source code
-//the html -code is open and is easy to update or modify  on the other tab page = app_httpd.cpp
 
-// Select camera model
-//#define CAMERA_MODEL_WROVER_KIT
-//#define CAMERA_MODEL_M5STACK_PSRAM
 #define CAMERA_MODEL_AI_THINKER
-
-const char* ssid = WIFI_SSID;
-const char* password = WIFI_PASSWORD;
-
-
-#if defined(CAMERA_MODEL_WROVER_KIT)
-#define PWDN_GPIO_NUM    -1
-#define RESET_GPIO_NUM   -1
-#define XCLK_GPIO_NUM    21
-#define SIOD_GPIO_NUM    26
-#define SIOC_GPIO_NUM    27
-#define Y9_GPIO_NUM      35
-#define Y8_GPIO_NUM      34
-#define Y7_GPIO_NUM      39
-#define Y6_GPIO_NUM      36
-#define Y5_GPIO_NUM      19
-#define Y4_GPIO_NUM      18
-#define Y3_GPIO_NUM       5
-#define Y2_GPIO_NUM       4
-#define VSYNC_GPIO_NUM   25
-#define HREF_GPIO_NUM    23
-#define PCLK_GPIO_NUM    22
-
-#elif defined(CAMERA_MODEL_M5STACK_PSRAM)
-#define PWDN_GPIO_NUM     -1
-#define RESET_GPIO_NUM    15
-#define XCLK_GPIO_NUM     27
-#define SIOD_GPIO_NUM     25
-#define SIOC_GPIO_NUM     23
-
-#define Y9_GPIO_NUM       19
-#define Y8_GPIO_NUM       36
-#define Y7_GPIO_NUM       18
-#define Y6_GPIO_NUM       39
-#define Y5_GPIO_NUM        5
-#define Y4_GPIO_NUM       34
-#define Y3_GPIO_NUM       35
-#define Y2_GPIO_NUM       32
-#define VSYNC_GPIO_NUM    22
-#define HREF_GPIO_NUM     26
-#define PCLK_GPIO_NUM     21
-
-#elif defined(CAMERA_MODEL_AI_THINKER) //zie esp32-cam schema v1.6.pdf
+#if defined(CAMERA_MODEL_AI_THINKER) //zie esp32-cam schema v1.6.pdf
 #define PWDN_GPIO_NUM     32
 #define RESET_GPIO_NUM    -1
 #define XCLK_GPIO_NUM      0
@@ -77,18 +27,21 @@ const char* password = WIFI_PASSWORD;
 #error "Camera model not selected"
 #endif
 
-
+//Servo tick conf, see https://github.com/jkb-git/ESP32Servo/blob/master/examples/Multiple-Servo-Example-ESP32/Multiple-Servo-Example-ESP32.ino
 #define COUNT_LOW 1638
 #define COUNT_HIGH 7864
-
 #define TIMER_WIDTH 16
 
 #include "esp32-hal-ledc.h"
+
+const char* ssid = WIFI_SSID;
+const char* password = WIFI_PASSWORD;
 
 //Servos PINS
 int SROTATE = 12; 
 int STILT = 14;      
 //Servos CHANNELS
+//WARNING : USE THIS CHANNEL, Others conflict with cam
 int CROTATE = 4;
 int CTILT = 5;
 //Servos fq
@@ -96,15 +49,15 @@ int FROTATE = 50;
 int FTILT = 50;
 
 //Max tilt & Rotate angle
-int MAXTILT = 50;
-int MAXROTATE = 180;
+int MAX_TILT = 55;
+int MAX_ROTATE = 180;
 
 //Margin tilt & rotate
-int MARGINTILT = 10;
-int MARGINROTATE = 0;
+int MARGIN_TILT = 5;
+int MARGIN_ROTATE = 0;
 
 //Dynamic Servos Pos
-extern int CAMTILT, CAMROTATE, CAMFAKE;
+extern int CAM_TILT, CAM_ROTATE;
 
 void startCameraServer();
 
@@ -205,21 +158,25 @@ void loop() {
   delay(500);
 }
 
-void doServo() {
-   Serial.print("CAMROTATE : ");Serial.print(CAMROTATE);Serial.print("CAMTILT : ");Serial.println(CAMTILT);
-   if (CAMTILT > MAXTILT + MARGINTILT) {
-      CAMTILT = MAXTILT + MARGINTILT;
-   } else if (CAMTILT < MARGINTILT) {
-	   CAMTILT = MARGINTILT;
+void handleMinMaxCam() {
+   Serial.print("CAM_ROTATE : ");Serial.print(CAM_ROTATE);Serial.print("CAM_TILT : ");Serial.println(CAM_TILT);
+   if (CAM_TILT > MAX_TILT + MARGIN_TILT) {
+      CAM_TILT = MAX_TILT + MARGIN_TILT;
+   } else if (CAM_TILT < MARGIN_TILT) {
+     CAM_TILT = MARGIN_TILT;
    }   
-   if (CAMROTATE > MAXROTATE + MARGINROTATE) {
-      CAMROTATE = MAXROTATE + MARGINROTATE;
-   } else if (CAMROTATE < MARGINROTATE) {
-	   CAMROTATE = MARGINROTATE;
+   if (CAM_ROTATE > MAX_ROTATE + MARGIN_ROTATE) {
+      CAM_ROTATE = MAX_ROTATE + MARGIN_ROTATE;
+   } else if (CAM_ROTATE < MARGIN_ROTATE) {
+     CAM_ROTATE = MARGIN_ROTATE;
    }
-   Serial.print("CAMROTATE : ");Serial.print(CAMROTATE);Serial.print("CAMTILT : ");Serial.println(CAMTILT);
-   int cr = map(CAMROTATE,0,180,COUNT_LOW,COUNT_HIGH);
-   int ct = map(CAMTILT,0,180,COUNT_LOW,COUNT_HIGH);       
+   Serial.print("CAM_ROTATE : ");Serial.print(CAM_ROTATE);Serial.print("CAM_TILT : ");Serial.println(CAM_TILT);  
+}
+
+void doServo() {
+   handleMinMaxCam(); 
+   int cr = map(CAM_ROTATE,0,180,COUNT_LOW,COUNT_HIGH);
+   int ct = map(CAM_TILT,0,180,COUNT_LOW,COUNT_HIGH);       
    Serial.print("cr : ");Serial.print(cr);Serial.print("ct : ");Serial.println(ct);
    ledcWrite(CROTATE, cr);
    ledcWrite(CTILT, ct);
