@@ -41,7 +41,7 @@ const char* password = WIFI_PASSWORD;
 int SROTATE = 12; 
 int STILT = 14;      
 //Servos CHANNELS
-//WARNING : USE THIS CHANNEL, Others conflict with cam
+//WARNING : USE THIS CHANNELS, Others conflict with cam
 int CROTATE = 4;
 int CTILT = 5;
 //Servos fq
