@@ -3,7 +3,7 @@
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
 
-#include "secrets.h"
+#include "secrets.h" 
 
 #define CAMERA_MODEL_AI_THINKER
 #if defined(CAMERA_MODEL_AI_THINKER) //zie esp32-cam schema v1.6.pdf
@@ -28,8 +28,8 @@
 #endif
 
 //Servo tick conf, see https://github.com/jkb-git/ESP32Servo/blob/master/examples/Multiple-Servo-Example-ESP32/Multiple-Servo-Example-ESP32.ino
-#define COUNT_LOW 1638
-#define COUNT_HIGH 7864
+#define COUNT_LOW 1802 //1638
+#define COUNT_HIGH 7699 //7864
 #define TIMER_WIDTH 16
 
 #include "esp32-hal-ledc.h"
