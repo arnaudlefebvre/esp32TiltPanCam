@@ -5,6 +5,7 @@
 
 #include "secrets.h" 
 
+//Only for AI THINKER
 #define CAMERA_MODEL_AI_THINKER
 #if defined(CAMERA_MODEL_AI_THINKER) //zie esp32-cam schema v1.6.pdf
 #define PWDN_GPIO_NUM     32
@@ -37,7 +38,7 @@
 const char* ssid = WIFI_SSID;
 const char* password = WIFI_PASSWORD;
 
-//Servos PINS
+//Servos PINS, see https://randomnerdtutorials.com/esp32-cam-ai-thinker-pinout/ for wiring
 int SROTATE = 12; 
 int STILT = 14;      
 //Servos CHANNELS
