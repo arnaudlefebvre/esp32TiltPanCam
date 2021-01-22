@@ -156,7 +156,7 @@ void setup() {
 
 void loop() {
   doServo();
-  delay(500);
+  delay(200);
 }
 
 void handleMinMaxCam() {
